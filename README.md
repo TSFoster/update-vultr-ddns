@@ -1,7 +1,6 @@
 # Update Vultr DDNS
 
-This script will periodically update the A records for a list of domains and subdomains managed by Vultr's DNS system, emulating a DDNS service.
-
+This script will periodically update the A records of a list of domains and subdomains (managed by Vultr's DNS system) with the external IP address of the host machine, emulating a DDNS service.
 
 ## Usage
 
