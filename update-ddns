@@ -20,18 +20,20 @@ while :; do
       RECORDS="$(eval $API/dns/records?domain=$domain)"
       if [ ! -z "$RECORDS" ]; then
         for subdomain in $(ls -1 /domains/$domain); do
+          if [ "$subdomain" = '@' ]; then subdomain=''; fi
+          url="$subdomain${subdomain:+.}$domain"
           CURRENTIPADDRESS="$(echo "$RECORDS" | jq '.[] | select(.name == "'$subdomain'" and .type == "A") | .data')"
           if [ "$CURRENTIPADDRESS" = '"'"$MYIPADDRESS"'"' ]; then
-            echo "No need to update $subdomain.$domain"
+            echo "No need to update $url"
             continue
           fi
           RECORDID="$(echo "$RECORDS" | jq '.[] | select(.name == "'$subdomain'" and .type == "A") | .RECORDID')"
           if [ -z "$RECORDID" ]; then
             eval "$API/dns/create_record --post-data 'domain=$domain&name=$subdomain&type=A&ttl=300&data=$MYIPADDRESS'"
-            echo "Created record for $subdomain.$domain"
+            echo "Created record for $url"
           else
             eval "$API/dns/update_record --post-data 'domain=$domain&RECORDID=$RECORDID&data=$MYIPADDRESS'"
-            echo "Updated record for $subdomain.$domain"
+            echo "Updated record for $url"
           fi
         done
       fi
